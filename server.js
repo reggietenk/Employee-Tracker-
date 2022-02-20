@@ -1,5 +1,7 @@
 const express = require('express');
-const mysql = require('mysql2');
+const db = require('./db/connection');
+// const apiRoutes = require('./routes/apiRoutes');
+const cTable = require('console.table');
 
 
 const PORT = process.env.PORT || 3001;
@@ -9,34 +11,19 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// create the connection to database
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: 'test'
-  });
+// // Use apiRoutes
+// app.use('/api', apiRoutes);
 
 
-// simple query
-connection.query(
-    'SELECT * FROM `table` WHERE `name` = "Page" AND `age` > 45',
-    function(err, results, fields) {
-      console.log(results); // results contains rows returned by server
-      console.log(fields); // fields contains extra meta data about results, if available
-    }
-  );
-  
-  // with placeholder
-  connection.query(
-    'SELECT * FROM `table` WHERE `name` = ? AND `age` > ?',
-    ['Page', 45],
-    function(err, results) {
-      console.log(results);
-    }
-  );
+app.use((req, res) => {
+  res.status(404).end();
+});
 
 
-
-app.listen(PORT, () => {
+db.connect(err => {
+  if (err) throw err;
+  console.log('Database connected.');
+  app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+});
